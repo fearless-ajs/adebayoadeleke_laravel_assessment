@@ -7,11 +7,13 @@ use App\Mail\ResetPasswordMail;
 use App\Models\PasswordReset;
 use App\Models\User;
 use App\Traits\ApiResponse;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\ResponseFactory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 
 class AuthController extends Controller
@@ -21,27 +23,37 @@ class AuthController extends Controller
     public function register(Request $request): JsonResponse
     {
         $request->validate([
-            'lastname'      => 'required|string',
-            'firstname'     => 'required|string',
-            'email'         => 'required|string|unique:users,email',
-            'password'      => 'required|string|confirmed'
+            'lastname'      => 'required|string|max:255',
+            'firstname'     => 'required|string|max:255',
+            'middlename'     => 'required|string|max:255',
+            'email'         => 'required|email|max:255|unique:users,email',
+            'password'      => 'required|string|max:255|confirmed',
+            'image'         => 'nullable|image|max:3000'
         ]);
 
+
+        $image_name = null;
+        // Check if an image is uploaded
+        if ($request->hasFile('image')){
+            $image_name = $this->saveUserImage($request->image, 'images');
+        }
+
         $user = User::create([
-            'lastname'  => $request->lastname,
-            'firstname' => $request->firstname,
-            'email'     => $request->email,
-            'password'  => $request->password
+            'lastname'      => $request->lastname,
+            'firstname'     => $request->firstname,
+            'middlename'    => $request->middlename,
+            'email'         => $request->email,
+            'image'         => $image_name,
+            'password'      => $request->password
         ]);
 
         $token = $user->createToken('myapptoken')->plainTextToken;
 
-        $response = [
-            'user'  => $user,
-            'token' => $token
-        ];
-
-        return $this->successResponse($response,200);
+        return $this->successResponse([
+            'errorCode' => 'SUCCESS',
+            'token'     => $token,
+            'data'      => $user
+        ],201);
     }
 
     public function login(Request $request): JsonResponse
@@ -78,7 +90,8 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function logout(Request $request) {
+    public function logout(Request $request): JsonResponse
+    {
         auth()->user()->tokens()->delete();
 
         return $this->successResponse([
@@ -124,7 +137,6 @@ class AuthController extends Controller
             'errorCode' => "SUCCESS",
             'message' => 'Reset link has been sent to you email address'
         ], 202);
-
 
     }
 

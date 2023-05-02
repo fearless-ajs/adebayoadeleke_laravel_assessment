@@ -5,6 +5,7 @@ namespace App\Traits;
 
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -22,14 +23,16 @@ trait ApiResponse
         return response()->json($message, $code);
     }
 
-    protected function showOne(Model $model, $code = 200){
+    protected function showOne(Model $model, $code = 200): JsonResponse
+    {
         return $this->successResponse([
             'errorCode' => 'SUCCESS',
             'data' => $model
         ], $code);
     }
 
-    protected function showMessage($message, $code = 200){
+    protected function showMessage($message, $code = 200): JsonResponse
+    {
         return $this->successResponse([
             'errorCode' => 'SUCCESS',
             'data' => $message
@@ -37,7 +40,8 @@ trait ApiResponse
     }
 
 
-    protected function showAll(Collection $collection, $code = 200){
+    protected function showAll(Collection $collection, $code = 200): JsonResponse
+    {
         // Perform a fractal transformation on the collection if not empty
         if ($collection->isEmpty()){
             return $this->successResponse([
@@ -62,7 +66,8 @@ trait ApiResponse
     }
 
 
-    protected function paginate(Collection $collection){
+    protected function paginate(Collection $collection): LengthAwarePaginator
+    {
         // Attach pagination validation rules
         $rules = [
             'per_page'  =>  'integer|min:2|max:50'
@@ -87,7 +92,8 @@ trait ApiResponse
         return $paginated; // return the paginated data
     }
 
-    protected function filterData(Collection $collection){
+    protected function filterData(Collection $collection): Collection
+    {
         foreach (request()->query() as $query => $value){
             if (isset($query, $value)){
                 if ($query != 'sort_by' && $query != 'per_page' && $query != 'page' ){
@@ -99,7 +105,7 @@ trait ApiResponse
         return $collection;
     }
 
-    protected function sortData(Collection $collection){
+    protected function sortData(Collection $collection): Collection{
         if (request()->has('sort_by')){
             $attribute  = request()->sort_by;
             $collection = $collection->sortBy->{$attribute};

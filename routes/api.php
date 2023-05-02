@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,13 +17,14 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/register',                                    [AuthController::class, 'register']);
-Route::post('/login',                                       [AuthController::class, 'login']);
+Route::post('/login',                                       [AuthController::class, 'login'])->name('login');
 Route::post('/reset-password',                              [AuthController::class, 'resetPassword']);
 Route::post('/choose-new-password/{token}',                 [AuthController::class, 'chooseNewPassword']);
 
+
 // Protected routes
-Route::group(['middleware' => ['auth:sanctum']], function () {
+Route::middleware('auth:sanctum')->group(function () {
+    Route::Resource('/users',                                 UserController::class);
     Route::post('/logout', [AuthController::class, 'logout']);
-
-
 });
+
