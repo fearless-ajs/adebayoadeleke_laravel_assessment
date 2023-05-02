@@ -25,7 +25,8 @@ class AuthController extends Controller
         $request->validate([
             'lastname'      => 'required|string|max:255',
             'firstname'     => 'required|string|max:255',
-            'middlename'     => 'required|string|max:255',
+            'middlename'    => 'required|string|max:255',
+            'phone'         => 'nullable|regex:/^([0-9\s\-\+\(\)]*)$/|min:10',
             'email'         => 'required|email|max:255|unique:users,email',
             'password'      => 'required|string|max:255|confirmed',
             'image'         => 'nullable|image|max:3000'
@@ -43,6 +44,7 @@ class AuthController extends Controller
             'firstname'     => $request->firstname,
             'middlename'    => $request->middlename,
             'email'         => $request->email,
+            'phone'         => $request->phone,
             'image'         => $image_name,
             'password'      => $request->password
         ]);

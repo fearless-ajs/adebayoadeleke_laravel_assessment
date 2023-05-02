@@ -37,6 +37,7 @@ class UserController extends Controller
             'firstname'     => 'required|string|max:255',
             'middlename'    => 'required|string|max:255',
             'email'         => 'required|email|max:255|unique:users,email',
+            'phone'         => 'nullable|regex:/^([0-9\s\-\+\(\)]*)$/|min:10',
             'password'      => 'required|string|max:255|confirmed',
             'image'         => 'nullable|image|max:3000'
         ]);
@@ -52,6 +53,7 @@ class UserController extends Controller
             'firstname'     => $request->firstname,
             'middlename'    => $request->middlename,
             'email'         => $request->email,
+            'phone'         => $request->phone,
             'image'         => $image_name,
             'password'      => $request->password
         ]);
@@ -99,6 +101,7 @@ class UserController extends Controller
             'firstname'     => 'string|max:255',
             'middlename'    => 'string|max:255',
             'email'         => 'string|email|max:255|unique:users,email',
+            'phone'         => 'nullable|regex:/^([0-9\s\-\+\(\)]*)$/|min:10',
             'image'         => 'nullable|image|max:3000',
             'admin'         => 'boolean',
             'active'        => 'boolean'
@@ -110,6 +113,7 @@ class UserController extends Controller
             'firstname',
             'middlename',
             'email',
+            'phone',
             'admin',
             'active'
         ]));
